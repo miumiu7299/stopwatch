@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<style>
+    .container{
+        text-align: center;
+    }
+    .btn {
+        border: none;
+        padding: 15px 40px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 30px;
+        margin: 5px 10px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+        box-shadow: 8px 8px 5px  #999;
+        border-radius: 15px;
+    }
+    .btn:active {
+
+        transform: translateY(4px ) translateX(4px );
+    }
+    .button {
+        background-color: #555555;
+        color: white;
+        border: 2px solid #555555;
+    }
+    .button:hover {
+        background-color: white;
+        color: black;
+
+    }
+
+    .button1 {
+        background-color: #4CAF50;
+        color: white;
+        border: 2px solid #4CAF50;
+    }
+
+    .button1:hover {
+        background-color: white;
+        color: black;
+
+    }
+
+
+    #time{
+        font-size:70px;
+        display: block;
+
+    }
+    h1{
+        font-size: 60px;
+        margin: 30px 0px;
+    }
+    table{
+        margin-left:auto;
+        margin-right:auto;
+        border-collapse: collapse;
+        width: 500px;
+        margin-top: 20px;
+    }
+    tr{
+        border-bottom: 1px solid #ddd;
+        font-size: 30px;
+    }
+</style>
+<head>
+    <meta charset="UTF-8">
+    <title>線上碼錶</title>
+</head>
+<body onload="show();">
+<div class="container">
+    <h1>線上碼錶</h1>
+    <span id="time"></span><br>
+    <button class="btn button" type="button" id="counterBtn">開始</button>
+    <button class="btn button1" type="button"  id="counterBtn1">重置</button>
+    <table id="myTable">
+        <tr></tr>
+    </table>
+</div>
+<script>
+    function StopWatch(){
+        let startAt=0;
+        let lapTime=0;
+
+        this.reset=function (){
+            startAt=lapTime=0;
+        };
+        let now=function(){
+            return(new Date().getTime());
+        };
+
+        this.start=function (){
+            if(!startAt) {
+                startAt = now();
+            }
+        };
+
+        this.stop=function (){
+            if(startAt) {
+                lapTime = lapTime + now() - startAt;
+            }
+            startAt=0;
+        };
+        this.time=function (){
+            if(startAt){
+                return lapTime+now()-startAt;
+            }
+            else{
+                return lapTime;
+            }
+
+        };
+    }
+    var x = new StopWatch();
+    let time;
+    let clockTimer;
+    function pad(num,size){
+        let s="00"+num;
+        return s.substring(s.length-size);
+    }
+    function formatTime(time){
+        let h = 0;
+        let m = 0;
+        let s = 0;
+        let ms = 0;
+        let newTime="";
+        h=Math.floor(time/(60*60*1000));
+        time=time%(60*60*1000);
+
+        m=Math.floor(time/(60*1000));
+        time=time%(60*1000);
+
+
+        ms=time%1000;
+        s=Math.floor(time/1000);
+
+        newTime = pad(h,2)+":"+pad(m,2)+":"+pad(s,2)+":"+pad(ms,3);
+        return newTime;
+    }
+    function show(){
+        time=document.getElementById("time");
+        update();
+    }
+    function update(){
+        time.innerHTML=formatTime(x.time());
+    }
+
+
+    let CountRow=0;
+
+    var counting =false;
+    var btn = document.getElementById("counterBtn");
+    var btn1 = document.getElementById("counterBtn1");
+    btn.addEventListener('click',function(){
+        if(counting){
+            x.stop();
+            clearInterval(clockTimer);
+            btn.textContent = "開始";
+            btn1.textContent = "重置";
+        }
+        else{
+            clockTimer=setInterval("update()",1);
+            x.start();
+            btn.textContent = "暫停";
+            btn1.textContent = "單圈";
+        }
+        counting = !counting;
+    });
+
+
+    btn1.addEventListener('click',function(){
+        if(counting){
+            let table = document.getElementById("myTable");
+            CountRow=CountRow+1;
+            if(CountRow===1){
+                let row = table.insertRow(-1);
+                let c1 = row.insertCell(0);
+                let c2 = row.insertCell(1);
+                c1.innerText="圈數";
+                c2.innerText="時間";
+                row.style.cssText="background-color:#04AA6D";
+                c1.style.cssText="color:white";
+                c2.style.cssText="color:white";
+            }
+            let row = table.insertRow(-1);
+            let c1 = row.insertCell(0);
+            let c2 = row.insertCell(1);
+            c1.innerText=CountRow;
+            c2.innerText=document.getElementById("time").innerText;
+
+        }
+        else{
+            stop();
+            x.reset();
+            update();
+            CountRow=0;
+            document.getElementById("myTable").innerText="";
+        }
+    });
+
+
+</script>
+
+</body>
+</html>
